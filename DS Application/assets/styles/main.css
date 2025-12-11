@@ -139,3 +139,10 @@ section div::after {
   overflow-y: auto;       /* TOC scrolls within its own column */
   background-color: #fafafa;
 }
+
+table.data-table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 1.0rem 0;
+    font-size: 0.9rem;
+}

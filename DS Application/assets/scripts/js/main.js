@@ -135,7 +135,8 @@ function addLargerImageLinks( ) {
 // ChatGPT-assisted in script creation
 // ---------------------------------------------------------
 // Load a CSV and render it into an existing <table> element
-// Optionally round numeric values to a fixed number of decimals.
+// Optionally round numeric values to a fixed number of decimals,
+// and append "%" for percent columns.
 // ---------------------------------------------------------
 function loadCsvIntoTable( csvUrl, tableElementId, options ) {
 
@@ -145,13 +146,19 @@ function loadCsvIntoTable( csvUrl, tableElementId, options ) {
         return;
     }
 
-    // options: { decimals: 1 }
+    // options: { decimals: 1, percentColumns: [ "percent_of_filtered_words", "% of Total" ] }
     options = options || {};
     const decimals = (
         typeof options.decimals === "number"
             ? options.decimals
             : null
     );
+
+    const percentColumns = Array.isArray( options.percentColumns )
+        ? options.percentColumns.map( function ( name ) {
+            return String( name ).toLowerCase();
+        } )
+        : [ ];
 
     fetch( csvUrl )
         .then( function ( response ) {
@@ -169,6 +176,13 @@ function loadCsvIntoTable( csvUrl, tableElementId, options ) {
                 }
             );
 
+            if ( rows.length === 0 ) {
+                return;
+            }
+
+            // First row is headers
+            const headers = rows[ 0 ];
+
             // Clear any existing table content
             while ( table.firstChild ) {
                 table.removeChild( table.firstChild );
@@ -180,22 +194,15 @@ function loadCsvIntoTable( csvUrl, tableElementId, options ) {
 
                 row.forEach( function ( cellText, colIndex ) {
 
-                    const cell = document.createElement( rowIndex === 0 ? "th" : "td" );
+                    const isHeader = ( rowIndex === 0 );
+                    const cell = document.createElement( isHeader ? "th" : "td" );
                     let displayText = cellText;
 
-                    // Only try to round on non-header rows and if decimals is set
-                    if ( rowIndex !== 0 && decimals !== null ) {
+                    if ( !isHeader && decimals !== null ) {
 
-                        // Trim whitespace
+                        // Trim whitespace and strip outer quotes
                         let trimmed = cellText.trim();
-
-                        // Strip leading/trailing double quotes if present
                         trimmed = trimmed.replace( /^"|"$/g, "" );
-
-                        const hasPercent = trimmed.endsWith( "%" );
-                        if ( hasPercent ) {
-                            trimmed = trimmed.slice( 0, -1 );
-                        }
 
                         // Try to parse as number
                         const num = Number( trimmed );
@@ -203,7 +210,17 @@ function loadCsvIntoTable( csvUrl, tableElementId, options ) {
                         if ( !Number.isNaN( num ) ) {
                             displayText = num.toFixed( decimals );
 
-                            if ( hasPercent ) {
+                            // Decide if this column should be shown as percent
+                            const headerName = headers[ colIndex ]
+                                ? String( headers[ colIndex ] ).toLowerCase()
+                                : "";
+
+                            const isPercentColumn =
+                                percentColumns.indexOf( headerName ) !== -1 ||
+                                headerName.indexOf( "%" ) !== -1 ||
+                                headerName.indexOf( "percent" ) !== -1;
+
+                            if ( isPercentColumn ) {
                                 displayText = displayText + "%";
                             }
                         }
@@ -226,7 +243,10 @@ window.addEventListener("load", myInit, true); function myInit(){
     addLargerImageLinks();
     loadCsvIntoTable(
         "assets/csv/RepeatedWords_Explanation.csv",
-        "repeated-words-explanation-table", 
-        { decimals: 1 } 
+        "repeated-words-explanation-table",
+        {
+            decimals: 1,
+            percentColumns: [ "percent_of_filtered_words", "% of Total" ]
+        }
     );
 };   
