@@ -154,17 +154,17 @@ function loadCsvIntoTable( csvUrl, tableElementId, options ) {
     );
 
     fetch( csvUrl )
-        .then( function( response ) {
+        .then( function ( response ) {
             if ( !response.ok ) {
                 throw new Error( "Network response was not ok: " + response.status );
             }
             return response.text();
         } )
-        .then( function( text ) {
+        .then( function ( text ) {
 
             // Simple CSV split: assumes no commas inside fields.
             const rows = text.trim().split( "\n" ).map(
-                function( row ) {
+                function ( row ) {
                     return row.split( "," );
                 }
             );
@@ -174,28 +174,37 @@ function loadCsvIntoTable( csvUrl, tableElementId, options ) {
                 table.removeChild( table.firstChild );
             }
 
-            rows.forEach( function( row, rowIndex ) {
+            rows.forEach( function ( row, rowIndex ) {
 
                 const tr = document.createElement( "tr" );
 
-                row.forEach( function( cellText, colIndex ) {
+                row.forEach( function ( cellText, colIndex ) {
 
                     const cell = document.createElement( rowIndex === 0 ? "th" : "td" );
                     let displayText = cellText;
 
                     // Only try to round on non-header rows and if decimals is set
                     if ( rowIndex !== 0 && decimals !== null ) {
+
                         // Trim whitespace
-                        const trimmed = cellText.trim();
+                        let trimmed = cellText.trim();
 
-                        // Simple "is this a number?" check:
-                        // matches optional sign, digits, optional decimal part
-                        const numericPattern = /^-?\d+(\.\d+)?$/;
+                        // Strip leading/trailing double quotes if present
+                        trimmed = trimmed.replace( /^"|"$/g, "" );
 
-                        if ( numericPattern.test( trimmed ) ) {
-                            const num = Number( trimmed );
-                            if ( !Number.isNaN( num ) ) {
-                                displayText = num.toFixed( decimals );
+                        const hasPercent = trimmed.endsWith( "%" );
+                        if ( hasPercent ) {
+                            trimmed = trimmed.slice( 0, -1 );
+                        }
+
+                        // Try to parse as number
+                        const num = Number( trimmed );
+
+                        if ( !Number.isNaN( num ) ) {
+                            displayText = num.toFixed( decimals );
+
+                            if ( hasPercent ) {
+                                displayText = displayText + "%";
                             }
                         }
                     }
@@ -207,7 +216,7 @@ function loadCsvIntoTable( csvUrl, tableElementId, options ) {
                 table.appendChild( tr );
             } );
         } )
-        .catch( function( err ) {
+        .catch( function ( err ) {
             console.error( "Error loading CSV:", err );
         } );
 }
