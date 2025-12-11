@@ -1,0 +1,141 @@
+* { font-family: Google Sans, Roboto, Arial, sans-serif; }
+
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+p { padding-inline-start: 20px; }
+
+h1 { border-top: 1px solid #E0E0E0; margin-top: 25px; }
+
+section div ul {
+    margin-left: 300px;
+}
+
+li {
+  padding: 5px 0;
+}
+
+cn, cnl { 
+    font-weight: 900;
+    font-variant: small-caps;
+}
+
+cnl::after { content: " [Length]";}
+
+ov { 
+    font-style: italic;
+    font-variant: small-caps;
+}
+
+#housekeeping h6 {
+  font-size: .65em;
+  font-weight: 100;
+}
+
+.item-content img {
+    width: 300px;
+    height: auto;
+    margin: 0 auto;
+    display: block;
+}
+
+.overlay-img {
+    float: none;
+    width: auto;
+    height: auto;
+    max-width: 90vw;
+    max-height: 90vh;
+    display: block;
+}
+
+.img-figure {
+    float: left;
+    margin: 0 1rem 1rem 0;     
+    text-align: center;   
+    width: 300px;  
+}
+
+.img-figure img {
+    display: block;
+    margin: 0 auto;           
+    width: 300px;             
+    height: auto;
+    border: 1px solid #ccc;     
+    box-shadow: 0 2px 6px rgba( 0, 0, 0, 0.2 );
+    border-radius: 4px;          
+}
+
+.img-figure img:hover {
+    box-shadow: 0 4px 12px rgba( 0, 0, 0, 0.3 );
+}
+
+.img-click-caption {
+    font-size: 0.75rem;
+    font-style: italic;
+    color: #666;
+    margin-top: 0.25rem;
+}
+
+section div::after {
+    content: "";
+    display: table; /* or block */
+    clear: both;
+}
+
+.todo {
+    background-color: lemonchiffon;
+}
+
+#title_page {
+    text-align: center;
+    h4 { color: #3b3b3b; }
+    h6 { color: #636363; }
+}
+
+#toc div { font-size: .4 em; }
+#toc div.h1 { margin-left: 0; margin-top: 15px; }
+#toc div.h2 { margin-left: 1em }
+#toc div.h3 { margin-left: 2em }
+#toc div.h4 { margin-left: 3em }
+#toc a { text-decoration: none; }
+
+.card {
+  box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+  transition: 0.3s;
+}
+
+.card:hover {
+  box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+}
+
+.container {
+  padding: 20px 16px;
+}
+
+.flex-container {
+  display: flex; 
+  width: 100%; 
+  height: 100vh;   
+  overflow: hidden;   
+}
+
+.item {
+  padding: 20px;
+}
+
+.item-content {
+  flex: 1 1 auto;
+  overflow-y: auto; 
+}
+
+.item-toc {
+  flex: 0 0 320px; 
+  min-width: 320px;
+  max-width: 320px;
+  border-left: 1px solid #ddd;
+  overflow-y: auto;       /* TOC scrolls within its own column */
+  background-color: #fafafa;
+}

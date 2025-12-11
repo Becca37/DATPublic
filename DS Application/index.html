@@ -1,0 +1,404 @@
+<html lang="en">
+
+    <head>
+
+        <meta charset="UTF-8">
+
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <title>Human Evaluation ChatGPT vs. Bard -- Data Analysis and Reporting -- 9A3ET9TQF3PJ</title>
+
+        <link rel="stylesheet" href="assets/styles/main.css">
+
+        <script type="text/javascript" src="assets/scripts/js/main.js" defer></script>
+
+    </head>
+
+    <body>
+
+        <div class="flex-container">
+
+            <div class="item item-content">                
+
+                <div id="content">
+
+                    <section>
+
+                        <h1>Executive Summary</h1>
+
+                        <h2>Overview</h2>
+                        
+                        <p>Human evaluators (workers) provided a prompt to two artificial intelligence models, ChatGPT and Bard, and tagged the prompts with a category and a complexity option. The workers then evaluated each model’s response, assigned a rating value, and provided an explanation for their rating. 1,003 records were observed for this analysis.</p>
+
+                        <h2>Key Findings</h2>
+                        
+                        <ul>
+                            <li>ChatGPT was favored, with 59.2% of the records rating ChatGPT’s responses as slightly better, better, or much better than Bard’s responses.</li>
+                            <li class="todo">[more?]</li>
+                        </ul>
+
+                        <h2>Recommendations for Improvement</h2>
+
+                        <ul>
+                            <li class="todo">[tbd]</li>
+                        </ul>
+
+                    </section>
+
+                    <section>
+
+                        <h1>Structure</h1>
+
+                        <h2>Conventions</h2>
+
+                        <p>Bold Small-Caps is used for column names, e.g, <cn>Prompt</cn>, <cn>Prompt Category</cn>, <cn>Explanation</cn>.</p>
+
+                        <p>Italics Small-Caps is used for option values, e.g., <ov>Hyperspecificity</ov>, <ov>Simple</ov>, <ov>Creative Writing</ov></p>
+
+                        <p>When an existing column is evaluated based on the character length of its content, <cnl></cnl> is appended to the column name.</p>
+
+                        <h2>Discussion</h2>	
+
+                        <p>This report discusses:</p>
+
+                        <ul>
+                            <li>Dataset Overview (source, shape, anomalies)</li>
+                            <li>Quantitative analysis
+                                <ul>
+                                    <li>Summary of each column, based on either
+                                        <ul>
+                                            <li>Content length e.g., row counts, length, mean</li>
+                                            <li>Options, e.g., <ov>Hyperspecificity</ov>, <ov>Simple</ov>, <ov>Creative Writing</ov></li>
+                                        </ul>
+                                    </li>
+                                    <li>Correlations explored between the two models, e.g., response length and rating, prompt category and rating, complexity and rating</li>
+                                    <li>Outliers, determined via box plots using Q1 - 1.5 * IQR and Q3 + 1.5 * IQR</li>
+                                </ul>
+                            </li>
+                            <li>Qualitative analysis based on <cn>Explanation</cn>
+                                <ul>
+                                    <li>Did the responses address the prompts in the worker’s view?</li>
+                                    <li>Did any themes appear frequently, e.g., formatting, on/off-topic, concise/verbose, and if so, did they appear more or less frequently in one model over the other?</li>
+                                </ul>
+                            </li>
+                            <li>Summary of the strengths, weaknesses, and notable patterns observed for each model</li>
+                            <li>An appendix is provided containing the Python script used to query the data and generate the images.</li>
+                        </ul>
+
+                        <h2>Visualizations</h2>
+
+                        <p>Two basic visualization types are used for viwing the quantitative analysis: tables for numbers and charts for data distributions.</p>
+
+                        <ul>
+                            <li>Tables
+                                <ul>
+                                    <li>Data description -- basic mathematical calculations on numeric data, e.g., <cn>Rating</cn>, <cnl>Prompt</cnl>, <cnl>ChatGPT</cnl>, to include record count, mean, standard deviation, min, 25th percentile, median, 75th percentile, and max</li>
+                                    <li>Data categorization -- record count by option or aspect for non-numeric data, e.g., <cn>Prompt Category</cn>, <cn>Complexity</cn>, <cn>Explantion</cn> presence or lack thereof </li>
+                                </ul>
+                            </li>
+                            <li>Charts
+                                <ul>
+                                    <li>Box-and-Whisker plot -- these plot the data description values (excluding record count)</li>
+                                    <li>Violin plot -- these plot the distribution of the data</li>
+                                </ul>
+                                These plots are combined in a single image, allowing for visualization of the descriptive and distribution values at the same time.
+                            </li>
+                        </ul>
+
+                    </section>
+
+                    <section>
+
+                        <h1>Dataset Overview</h1>
+
+                        <h2>Data Source</h2>
+
+                        <p>Data was provided in a Google Sheets spreadsheet.</p>
+
+                        <h2>Data Shape</h2>
+
+                        <p>The file contained 1,003 records with the following 8 columns: </p>
+
+                        <ul>
+                            <li><cn>Prompt</cn></li>
+                            <li><cn>Prompt Category</cn></li>
+                            <li><cn>Complexity</cn></li>
+                            <li><cn>ChatGPT</cn></li>
+                            <li><cn>Bard</cn></li>
+                            <li><cn>Which model is more helpful, safe, and honest? (rating)</cn></li>
+                            <li><cn>Which model is more helpful, safe, and honest? (text)</cn></li>
+                            <li><cn>Explanation</cn></li>
+                        </ul>
+
+                        <h2>Data Anomalies</h2>
+
+                        <div>
+                            
+                            <img src="assets/figures/category/Categories_ExplanationPresence.png" alt="Image shows a table with record count and percentages by options." />
+
+                            <p>Of the 1,003 records, data appeared in every column except for 226 (22.5 %) records which had no <cn>Explanation</cn> value. </p>
+
+                            <p>If this data point was not required, this is likely a non-issue.</p>
+
+                            <p>If this data point was required, the reason as to why an <cn>Explanation</cn> value was not present in every row should be investigated. 
+
+                        </div>
+
+                        <p>Possibilities include, but are not limited to:</p>
+
+                        <ul>
+                            <li>The worker in 777 entries found a way around providing input</li>
+                            <li>Data was input but not captured</li>
+                            <li>Data was captured but not transferred to the Google Sheets Sheet</li>
+                        </ul>
+
+                        <p>In the qualitative analysis, this column will be covered twice, once with all values and once with 0-length values excluded.</p>
+
+                        <h2>Data Cleaning</h2>
+
+                        <p>Columns were either (a) free-form text, or (b) preset options. The only cleaning performed is in the quantitative analysis of the <cn>Explanation</cn> column as noted in the <a href="#data_anomalies">Data Anomalies</a> section. </p>
+
+                        <h2>Data Transformation</h2>                        
+
+                        <p>The rating, which is provided in two columns -- one for numeric rating of 1 through 7, and one for the text-based equivalent -- were combined into a new column called <cn>Rating</cn> for discussion purposes. The separate values appear in some of the figures.</p>
+
+                    </section>
+
+                    <section>
+
+                        <h1>Quantitative Analysis</h1>
+
+                        <h2>Prompt Column</h2>
+
+                        <div>
+
+                            <img src="assets/figures/describe/Describe_Prompt_Length.png" alt="Image shows a table with record count, mean, standard deviation, minimum, 25th percentile, median, 75th percentile, and maximum based on character length." />
+
+                            <p>The <cn>Prompt</cn> column contained text, with length values ranging from 11 to 28155 characters in length, with a median value of 236.</p>
+
+                        </div>
+
+                        <div>
+
+                            <img src="assets/figures/visualize/Prompt_Length.png" alt="Images shows a chart with box-and-whiskers plus viloin plots of data by length." />
+
+                            <p><cn>Prompt</cn> length values had 132 (13.2%) outliers, ranging from 1836 to 28155, with a median value of 3159.5.</p>
+                        
+                        </div>
+
+                        <h2>Prompt Category Column</h2>
+
+                        <div>
+
+                            <img src="assets/figures/category/Categories_Prompt_Category.png" alt="Image shows a table with record count and percentages by options." />
+
+                            <p>The <cn>Prompt Category</cn> column had thirteen options with a 4.6% span between most common <ov>Creative Writing</ov> (9.9%) to least common <ov>Coding</ov> (5.3%).</p>
+
+                        </div>
+
+                        <div>
+
+                            <img src="assets/figures/comparison/Rating_by_Prompt_Category.png" alt="Images shows a chart with box-and-whiskers plus viloin plots of data by options." />
+
+                            <p>Each <cn>Prompt Category</cn> option covered all <cn>Rating</cn> values.</p>
+
+                            <ul>
+                                <li><ov>Mathematical reasoning</ov> had the broadest range with the 75th percentile reaching <ov>ChatGPT better (6)</ov> and the 25th percentile reaching <ov>Bard better (2)</ov>.</li>
+                                <li><ov>Poetry</ov> had the only outliers, with the 75th percentile landing between <ov>ChatGPT much better (7)</ov> and <ov>ChatGPT better (6)</ov> and the 25th percentile reaching <ov>ChatGPT slight better (5)</ov> with outliers at <ov>Bard better (2)</ov> and <ov>Bard much better (1)</ov>.</li>
+                            </ul>
+
+                        </div>
+
+                        <h2>Complexity Column</h2>
+
+                        <div>
+
+                            <img src="assets/figures/category/Categories_Complexity.png" alt="Image shows a table with record count and percentages by options." />
+
+                            <p>The <cn>Complexity</cn> column had two options, with a 9.2% span between most common <ov>Simple</ov> (54.6%) to least common <ov>Hyperspecific</ov> (45.4%).</p>
+
+                        </div>
+
+                        <div>
+
+                            <img src="assets/figures/comparison/Rating_by_Complexity.png" alt="Images shows a chart with box-and-whiskers plus viloin plots of data by options." />
+
+                            <p>Both <cn>Complexity</cn> options covered all <cn>Rating</cn> values, and both had a median value of <ov>ChatGPT slightly better (5)</ov>. </p>
+
+                            <p>The <ov>Hyperspecific</ov> type was denser for the <ov>About the same (4)</ov> and the three rating options favoring ChatGPT. </p>
+
+                            <p>The <ov>Simple</ov> type density was somewhat more evenly distributed across the full range, though thinning for the <ov>Bard better (2)</ov> and <ov>Bard much better (1)</ov> options.</p>
+
+                            <p>There were no outliers.</p>
+
+                        </div>
+
+                        <h2>ChatGPT Column</h2>
+
+                        <div>
+
+                            <img src="assets/figures/describe/Describe_ChatGPT_Response_Length.png" alt="Image shows a table with record count, mean, standard deviation, minimum, 25th percentile, median, 75th percentile, and maximum based on character length." />
+
+                            <p>The <cn>ChatGPT</cn> column contained text, with values ranging from 3 to 4428 characters in length, with a median value of 902.</p>
+
+                        </div>
+
+                        <div>
+
+                            <img src="assets/figures/visualize/ChatGPT_Response_Length.png" alt="Images shows a chart with box-and-whiskers plus viloin plots of data by length." />
+
+                            <p><cn>ChatGPT</cn> length values had 22 (2.2%) outliers, ranging from 3332 to 4428, with a median value of 3538.0.</p>
+
+                        </div>
+
+                        <h2>Bard</h2>
+
+                        <div>
+
+                            <img src="assets/figures/describe/Describe_Bard_Response_Length.png" alt="Image shows a table with record count, mean, standard deviation, minimum, 25th percentile, median, 75th percentile, and maximum based on character length." />
+
+                            <p>The <cn>Bard</cn> column contained text, with length values ranging from 39 to 4002 characters in length, with a median value of 885.</p>
+
+                        </div>
+
+                        <div>
+
+                            <img src="assets/figures/visualize/Bard_Response_Length.png" alt="Images shows a chart with box-and-whiskers plus viloin plots of data by length." />
+
+                            <p><cn>Bard</cn> length values had 20 (2.0%) outliers, ranging from 2881 to 4002, with a median value of 3231.0.</p>
+                            
+                        </div>
+
+                        <h2>Rating</h2>
+
+                        <div>
+
+                            <img src="assets/figures/category/Categories_Rating_(Text_(Number)).png" alt="Image shows a table with record count and percentages by options." />
+
+                            <p>The Rating, “Which model was more helpful, safe, and honest?”, was present as two columns. The first a numerical rating, the second the text phrase associated with that numerical rating.</p>
+
+                            <p>Combining slightly better, better, and much better, ChatGPT (59.2%) was rated more favorably than Bard (24.6%), with the remaining 16.3% reported to be <ov>About the Same (4)</ov>.</p>
+
+                        </div>
+
+                        <div>
+
+                            <img src="assets/figures/visualize/Rating.png" alt="Images shows a chart with box-and-whiskers plus viloin plots of data by options." />
+
+                            <p>The median rating was <ov>ChatGPT slightly better (5)</ov>.</p>
+
+                            <p>There were no outliers.</p>
+
+                        </div>
+
+                        <h2>Explanation Column (all values)</h2>
+
+                        <div>
+
+                            <img src="assets/figures/describe/Describe_Explanation_Length.png" alt="Image shows a table with record count, mean, standard deviation, minimum, 25th percentile, median, 75th percentile, and maximum based on character length." />
+
+                            <p>The <cn>Explanation</cn> column contained text, with length values ranging from 0 (as mentioned in the anomalies slide) to 2246 characters in length, with a median value of 188.</p>
+
+                        </div>
+
+                        <div>
+
+                            <img src="assets/figures/visualize/Explanation_Length.png" alt="Images shows a chart with box-and-whiskers plus viloin plots of data by length." />
+
+                            <p><cn>Explanation</cn> length values had 29 (2.9%) outliers, ranging from 595.0 to 2246.0, with a median value of 718.0.</p>
+
+                        </div>
+
+                        <h2>Explanation Column (non-zero)</h2>
+
+                        <div>
+
+                            <img src="assets/figures/describe/Describe_Explanation_Length_(NonZero).png" alt="Image shows a table with record count, mean, standard deviation, minimum, 25th percentile, median, 75th percentile, and maximum based on character length." />
+
+                            <p>The <cn>Explanation</cn> column – excluding the records without an explanation – had length values ranging from 26 to 2246 characters in length, with a median value of 233.</p>
+
+                        </div>
+
+                        <div>
+
+                            <img src="assets/figures/visualize/Explanation_Length_(NonZero).png" alt="Images shows a chart with box-and-whiskers plus viloin plots of data by length." />
+
+                            <p><cn>Explanation</cn> length (non-zero) values had 36 (4.6%) outliers, ranging from 566.0 to 2246.0, with a median value of 695.5.</p>
+
+                        </div>
+
+                    </section>
+
+                    <section>
+
+                        <h1>Qualitative Analysis</h1>
+
+                        <h2>ChatGPT Responses</h2>
+
+                        <h3>ChatGPT Strengths</h3>
+
+                        <h3>ChatGPT Weaknesses</h3>
+
+                        <h3>ChatGPT Notable Patterns</h3>
+
+                        <h2>Bard Responses</h2>
+
+                        <h3>Bard Strengths</h3>
+
+                        <h3>Bard Weaknesses</h3>
+
+                        <h3>Bard Notable Patterns</h3>
+
+                        <h2>Explanations</h2>
+
+                        <h3>Objective themes?</h3>
+
+                        <h3>Subjective themes?</h3>
+
+                    </section>
+
+                    <section>
+
+                        <h1>Appendix</h1>
+
+                        <h2>Repeated Words in Explanation Column (.csv)</h2>
+                        
+                        <table id="repeated-words-explanation-table"></table>
+
+                    </section>
+
+                </div>
+                
+            </div>
+
+            <div class="item item-toc">
+
+                <div id="nav" class="card">   
+
+                    <div class="container">
+
+                        <div id="housekeeping">
+
+                            <h1 id="doc_title">Human Evaluation ChatGPT vs. Bard</h1>
+
+                            <h2 id="doc_subtitle">Data Analysis and Reporting</h2>
+
+                            <h6 id="doc_author">Author: 9A3ET9TQF3PJ</h4>
+
+                        </div>
+
+                        <h4><b>Table of Contents</b></h4>  
+
+                        <div id="toc"></div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </body>
+
+</html>
