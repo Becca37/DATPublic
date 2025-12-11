@@ -133,13 +133,25 @@ function addLargerImageLinks( ) {
 }
 
 // ChatGPT-assisted in script creation
-function loadCsvIntoTable( csvUrl, tableElementId ) {
+// ---------------------------------------------------------
+// Load a CSV and render it into an existing <table> element
+// Optionally round numeric values to a fixed number of decimals.
+// ---------------------------------------------------------
+function loadCsvIntoTable( csvUrl, tableElementId, options ) {
 
     const table = document.getElementById( tableElementId );
     if ( !table ) {
         console.warn( "loadCsvIntoTable: No table element found with id:", tableElementId );
         return;
     }
+
+    // options: { decimals: 1 }
+    options = options || {};
+    const decimals = (
+        typeof options.decimals === "number"
+            ? options.decimals
+            : null
+    );
 
     fetch( csvUrl )
         .then( function( response ) {
@@ -151,7 +163,6 @@ function loadCsvIntoTable( csvUrl, tableElementId ) {
         .then( function( text ) {
 
             // Simple CSV split: assumes no commas inside fields.
-            // For more complex CSV, consider a real parser (e.g. PapaParse).
             const rows = text.trim().split( "\n" ).map(
                 function( row ) {
                     return row.split( "," );
@@ -167,9 +178,29 @@ function loadCsvIntoTable( csvUrl, tableElementId ) {
 
                 const tr = document.createElement( "tr" );
 
-                row.forEach( function( cellText ) {
+                row.forEach( function( cellText, colIndex ) {
+
                     const cell = document.createElement( rowIndex === 0 ? "th" : "td" );
-                    cell.textContent = cellText;
+                    let displayText = cellText;
+
+                    // Only try to round on non-header rows and if decimals is set
+                    if ( rowIndex !== 0 && decimals !== null ) {
+                        // Trim whitespace
+                        const trimmed = cellText.trim();
+
+                        // Simple "is this a number?" check:
+                        // matches optional sign, digits, optional decimal part
+                        const numericPattern = /^-?\d+(\.\d+)?$/;
+
+                        if ( numericPattern.test( trimmed ) ) {
+                            const num = Number( trimmed );
+                            if ( !Number.isNaN( num ) ) {
+                                displayText = num.toFixed( decimals );
+                            }
+                        }
+                    }
+
+                    cell.textContent = displayText;
                     tr.appendChild( cell );
                 } );
 
