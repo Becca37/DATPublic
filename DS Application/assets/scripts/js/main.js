@@ -217,6 +217,7 @@ window.addEventListener("load", myInit, true); function myInit(){
     addLargerImageLinks();
     loadCsvIntoTable(
         "assets/csv/RepeatedWords_Explanation.csv",
-        "repeated-words-explanation-table"
+        "repeated-words-explanation-table", 
+        { decimals: 1 } 
     );
 };   
