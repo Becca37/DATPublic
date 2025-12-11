@@ -140,9 +140,46 @@ section div::after {
   background-color: #fafafa;
 }
 
+/* Generic data table styling */
+
 table.data-table {
     border-collapse: collapse;
     width: 100%;
     margin: 1.0rem 0;
     font-size: 0.9rem;
+}
+
+/* Header row */
+table.data-table tr:first-child {
+    background-color: #f2f2f2;
+}
+
+table.data-table th {
+    font-weight: 600;
+    text-align: left;
+    padding: 0.4rem 0.6rem;
+    border-bottom: 2px solid #cccccc;
+}
+
+/* Body cells */
+table.data-table td {
+    padding: 0.35rem 0.6rem;
+    border-bottom: 1px solid #eeeeee;
+}
+
+/* Zebra striping for body rows (skip header) */
+table.data-table tr:nth-child(odd):not(:first-child) {
+    background-color: #ffffff;
+}
+
+table.data-table tr:nth-child(even):not(:first-child) {
+    background-color: #f9f9f9;
+}
+
+/* Optional: align number-heavy columns to the right, first column left */
+table.data-table td:first-child {
+    text-align: left;
+}
+table.data-table td:not(:first-child) {
+    text-align: right;
 }
