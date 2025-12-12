@@ -187,7 +187,7 @@ table.data-table tr:nth-child(odd):not(:first-child) {
 }
 
 table.data-table tr:nth-child(even):not(:first-child) {
-    background-color: #FCFCFC:;
+    background-color: #FCFCFC;
 }
 
 /* Optional: align number-heavy columns to the right, first column left */
