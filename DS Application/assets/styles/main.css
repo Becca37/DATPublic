@@ -172,7 +172,7 @@ table.data-table th {
     font-weight: 600;
     text-align: left;
     padding: 0.4rem 0.6rem;
-    border-bottom: 2px solid #cccccc;
+    border-bottom: 2px solid #f9f9f9;
 }
 
 /* Body cells */
@@ -187,7 +187,7 @@ table.data-table tr:nth-child(odd):not(:first-child) {
 }
 
 table.data-table tr:nth-child(even):not(:first-child) {
-    background-color: #f9f9f9;
+    background-color: #FCFCFC:;
 }
 
 /* Optional: align number-heavy columns to the right, first column left */
