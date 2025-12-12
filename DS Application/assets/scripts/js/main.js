@@ -218,7 +218,7 @@ function loadCsvIntoTable( csvUrl, tableElementId, options ) {
 
 // ---------------------------------------------------------
 // Wrapper: compute percentColumns from the CSV header row,
-// based on "%" being in the header text, then call loadCsvIntoTable.
+// based on "%" or "precent" being in the header text, then call loadCsvIntoTable.
 // ---------------------------------------------------------
 function loadCsvIntoTableAutoPercent( csvUrl, tableElementId, options ) {
 
@@ -238,8 +238,15 @@ function loadCsvIntoTableAutoPercent( csvUrl, tableElementId, options ) {
                 return String( h ).trim();
             } );
 
-            const percentColumns = headers.filter( function ( h ) {
-                return h.indexOf( "%" ) !== -1;
+           const percentColumns = headers.filter( function ( h ) {
+
+                const lower = String( h ).toLowerCase();
+
+                return (
+                    lower.indexOf( "%" ) !== -1 ||
+                    lower.indexOf( "percent" ) !== -1
+                );
+
             } );
 
             const mergedOptions = Object.assign(
