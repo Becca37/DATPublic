@@ -250,7 +250,7 @@ window.addEventListener("load", myInit, true); function myInit(){
         }
     );
     loadCsvIntoTable(
-        "output/csv/crosstab/Crosstab_Complexity_by_Rating",
+        "output/csv/crosstab/Crosstab_Complexity_by_Rating.csv",
         "complexity-by-rating-table",
         {
             decimals: 1,
