@@ -328,7 +328,7 @@ def generate_crosstab_csv( df, numeric_col, category_col ):
 
    print( f" ... ... CSV ( count + % of column ): {friendly_category} by {friendly_rating} ... " )
 
-   outdir = CSV_ROOT / "crosstab"
+   outdir = CSV_ROOT
    outdir.mkdir( parents = True, exist_ok = True )
 
    tmp_df = df.copy()
