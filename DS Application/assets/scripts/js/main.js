@@ -1,5 +1,3 @@
-
-
 function htmlTableOfContents( ) {
     // Adapted from Source - https://stackoverflow.com/a
     // Posted by Hasse Björk, modified by community. See post 'Timeline' for change history
@@ -16,24 +14,17 @@ function htmlTableOfContents( ) {
             var ref;
 
             if ( heading.hasAttribute( "id" ) ) {
-                // Use existing id
                 ref = heading.getAttribute( "id" );
             } else {
-                // Build id from heading text:
-                //  - trim
-                //  - lowercase
-                //  - replace spaces with underscores
                 var baseId = heading.textContent
                     .trim()
                     .toLowerCase()
                     .replace( /\s+/g, "_" );
 
-                // Fallback if heading text is empty
                 if ( !baseId ) {
                     baseId = "toc_" + sectionIndex + "_" + headingIndex;
                 }
 
-                // Ensure uniqueness (avoid duplicate ids)
                 var uniqueId = baseId;
                 var counter = 2;
                 while ( document.getElementById( uniqueId ) ) {
@@ -64,19 +55,15 @@ function addLargerImageLinks( ) {
 
         if ( img.dataset.hasCaption ) return;
 
-        // Create wrapper
         const figure = document.createElement( "figure" );
         figure.className = "img-figure";
 
-        // Insert figure before the image, then move img inside
         img.parentNode.insertBefore( figure, img );
         figure.appendChild( img );
 
-        // Create caption
         const caption = document.createElement( "figcaption" );
         caption.className = "img-click-caption";
 
-        // 1) Alt text line (if any)
         const altText = img.alt || "";
         if ( altText ) {
             const altSpan = document.createElement( "span" );
@@ -85,7 +72,6 @@ function addLargerImageLinks( ) {
             caption.appendChild( altSpan );
         }
 
-        // 2) "Click to enlarge" line
         const infoSpan = document.createElement( "span" );
         infoSpan.className = "img-caption-instruction";
         infoSpan.textContent = " Click image to enlarge";
@@ -95,7 +81,6 @@ function addLargerImageLinks( ) {
 
         img.dataset.hasCaption = "true";
 
-        // Click to enlarge behavior
         img.style.cursor = "zoom-in";
 
         img.addEventListener( "click", function( ) {
@@ -132,7 +117,6 @@ function addLargerImageLinks( ) {
     } );
 }
 
-// ChatGPT-assisted in script creation
 // ---------------------------------------------------------
 // Load a CSV and render it into an existing <table> element
 // Optionally round numeric values to a fixed number of decimals,
@@ -146,7 +130,6 @@ function loadCsvIntoTable( csvUrl, tableElementId, options ) {
         return;
     }
 
-    // options: { decimals: 1, percentColumns: [ "percent_of_filtered_words", "% of Total" ] }
     options = options || {};
     const decimals = (
         typeof options.decimals === "number"
@@ -180,10 +163,8 @@ function loadCsvIntoTable( csvUrl, tableElementId, options ) {
                 return;
             }
 
-            // First row is headers
             const headers = rows[ 0 ];
 
-            // Clear any existing table content
             while ( table.firstChild ) {
                 table.removeChild( table.firstChild );
             }
@@ -200,17 +181,14 @@ function loadCsvIntoTable( csvUrl, tableElementId, options ) {
 
                     if ( !isHeader && decimals !== null ) {
 
-                        // Trim whitespace and strip outer quotes
                         let trimmed = cellText.trim();
                         trimmed = trimmed.replace( /^"|"$/g, "" );
 
-                        // Try to parse as number
                         const num = Number( trimmed );
 
                         if ( !Number.isNaN( num ) ) {
                             displayText = num.toFixed( decimals );
 
-                            // Decide if this column should be shown as percent
                             const headerName = headers[ colIndex ]
                                 ? String( headers[ colIndex ] ).toLowerCase()
                                 : "";
@@ -238,9 +216,55 @@ function loadCsvIntoTable( csvUrl, tableElementId, options ) {
         } );
 }
 
-window.addEventListener("load", myInit, true); function myInit(){  
+// ---------------------------------------------------------
+// Wrapper: compute percentColumns from the CSV header row,
+// based on "%" being in the header text, then call loadCsvIntoTable.
+// ---------------------------------------------------------
+function loadCsvIntoTableAutoPercent( csvUrl, tableElementId, options ) {
+
+    options = options || {};
+
+    fetch( csvUrl )
+        .then( function ( response ) {
+            if ( !response.ok ) {
+                throw new Error( "Network response was not ok: " + response.status );
+            }
+            return response.text();
+        } )
+        .then( function ( text ) {
+
+            const firstLine = ( text.split( /\r?\n/ )[ 0 ] || "" ).trim();
+            const headers = firstLine.split( "," ).map( function ( h ) {
+                return String( h ).trim();
+            } );
+
+            const percentColumns = headers.filter( function ( h ) {
+                return h.indexOf( "%" ) !== -1;
+            } );
+
+            const mergedOptions = Object.assign(
+                { },
+                options,
+                { percentColumns: percentColumns }
+            );
+
+            loadCsvIntoTable( csvUrl, tableElementId, mergedOptions );
+
+        } )
+        .catch( function ( err ) {
+            console.error( "Error loading CSV header:", err );
+            loadCsvIntoTable( csvUrl, tableElementId, options );
+        } );
+
+}
+
+window.addEventListener( "load", myInit, true );
+
+function myInit( ) {  
+
     htmlTableOfContents();
     addLargerImageLinks();
+
     loadCsvIntoTable(
         "output/csv/RepeatedWords_Explanation.csv",
         "repeated-words-explanation-table",
@@ -249,12 +273,18 @@ window.addEventListener("load", myInit, true); function myInit(){
             percentColumns: [ "percent_of_filtered_words", "% of Total" ]
         }
     );
-    loadCsvIntoTable(
+
+    // Crosstabs: percent columns inferred from headers containing "%"
+    loadCsvIntoTableAutoPercent(
         "output/csv/Crosstab_Complexity_by_Rating.csv",
         "complexity-by-rating-table",
-        {
-            decimals: 1,
-            percentColumns: [ "Hyperspecific (% of Column)", "Simple (% of Column)", "Total (% of Column)" ]
-        }
+        { decimals: 1 }
     );
-};   
+
+    loadCsvIntoTableAutoPercent(
+        "output/csv/Crosstab_Prompt_Category_by_Rating.csv",
+        "prompt-category-by-rating-table",
+        { decimals: 1 }
+    );
+
+}
