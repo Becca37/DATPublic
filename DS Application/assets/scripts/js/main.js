@@ -242,11 +242,19 @@ window.addEventListener("load", myInit, true); function myInit(){
     htmlTableOfContents();
     addLargerImageLinks();
     loadCsvIntoTable(
-        "assets/csv/RepeatedWords_Explanation.csv",
+        "output/csv/RepeatedWords_Explanation.csv",
         "repeated-words-explanation-table",
         {
             decimals: 1,
             percentColumns: [ "percent_of_filtered_words", "% of Total" ]
+        }
+    );
+    loadCsvIntoTable(
+        "output/csv/crosstab/Crosstab_Complexity_by_Rating",
+        "complexity-by-rating-table",
+        {
+            decimals: 1,
+            percentColumns: [ "Hyperspecific (% of Column)", "Simple (% of Column)", "Total (% of Column)" ]
         }
     );
 };   

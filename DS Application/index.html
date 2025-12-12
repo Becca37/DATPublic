@@ -134,7 +134,7 @@
 
                         <div>
                             
-                            <img src="assets/figures/category/Categories_ExplanationPresence.png" alt="Image shows a table with record count and percentages by options." />
+                            <img src="output/figures/category/Categories_ExplanationPresence.png" alt="Image shows a table with record count and percentages by options." />
 
                             <p>Of the 1,003 records, data appeared in every column except for 226 (22.5 %) records which had no <cn>Explanation</cn> value. </p>
 
@@ -172,7 +172,7 @@
 
                         <div>
 
-                            <img src="assets/figures/describe/Describe_Prompt_Length.png" alt="Image shows a table with record count, mean, standard deviation, minimum, 25th percentile, median, 75th percentile, and maximum based on character length." />
+                            <img src="output/figures/describe/Describe_Prompt_Length.png" alt="Image shows a table with record count, mean, standard deviation, minimum, 25th percentile, median, 75th percentile, and maximum based on character length." />
 
                             <p>The <cn>Prompt</cn> column contained text, with length values ranging from 11 to 28155 characters in length, with a median value of 236.</p>
 
@@ -180,7 +180,7 @@
 
                         <div>
 
-                            <img src="assets/figures/visualize/Prompt_Length.png" alt="Images shows a chart with box-and-whiskers plus viloin plots of data by length." />
+                            <img src="output/figures/visualize/Prompt_Length.png" alt="Images shows a chart with box-and-whiskers plus viloin plots of data by length." />
 
                             <p><cn>Prompt</cn> length values had 132 (13.2%) outliers, ranging from 1836 to 28155, with a median value of 3159.5.</p>
                         
@@ -190,7 +190,7 @@
 
                         <div>
 
-                            <img src="assets/figures/category/Categories_Prompt_Category.png" alt="Image shows a table with record count and percentages by options." />
+                            <img src="output/figures/category/Categories_Prompt_Category.png" alt="Image shows a table with record count and percentages by options." />
 
                             <p>The <cn>Prompt Category</cn> column had thirteen options with a 4.6% span between most common <ov>Creative Writing</ov> (9.9%) to least common <ov>Coding</ov> (5.3%).</p>
 
@@ -198,14 +198,13 @@
 
                         <div>
 
-                            <img src="assets/figures/comparison/Rating_by_Prompt_Category.png" alt="Images shows a chart with box-and-whiskers plus viloin plots of data by options." />
+                            <img src="output/figures/comparison/Rating_by_Prompt_Category.png" alt="Images shows a chart with box-and-whiskers plus viloin plots of data by options." />
 
                             <p>Each <cn>Prompt Category</cn> option covered all <cn>Rating</cn> values.</p>
 
-                            <ul>
-                                <li><ov>Mathematical reasoning</ov> had the broadest range with the 75th percentile reaching <ov>ChatGPT better (6)</ov> and the 25th percentile reaching <ov>Bard better (2)</ov>.</li>
-                                <li><ov>Poetry</ov> had the only outliers, with the 75th percentile landing between <ov>ChatGPT much better (7)</ov> and <ov>ChatGPT better (6)</ov> and the 25th percentile reaching <ov>ChatGPT slight better (5)</ov> with outliers at <ov>Bard better (2)</ov> and <ov>Bard much better (1)</ov>.</li>
-                            </ul>
+                            <p>Mathematical reasoning</ov> had the broadest range with the 75th percentile reaching <ov>ChatGPT better (6)</ov> and the 25th percentile reaching <ov>Bard better (2)</ov>.</p>
+                            
+                            <p>Poetry</ov> had the only outliers, with the 75th percentile landing between <ov>ChatGPT much better (7)</ov> and <ov>ChatGPT better (6)</ov> and the 25th percentile reaching <ov>ChatGPT slight better (5)</ov> with outliers at <ov>Bard better (2)</ov> and <ov>Bard much better (1)</ov>.</p>
 
                         </div>
 
@@ -213,7 +212,7 @@
 
                         <div>
 
-                            <img src="assets/figures/category/Categories_Complexity.png" alt="Image shows a table with record count and percentages by options." />
+                            <img src="output/figures/category/Categories_Complexity.png" alt="Image shows a table with record count and percentages by options." />
 
                             <p>The <cn>Complexity</cn> column had two options, with a 9.2% span between most common <ov>Simple</ov> (54.6%) to least common <ov>Hyperspecific</ov> (45.4%).</p>
 
@@ -221,7 +220,7 @@
 
                         <div>
 
-                            <img src="assets/figures/comparison/Rating_by_Complexity.png" alt="Images shows a chart with box-and-whiskers plus viloin plots of data by options." />
+                            <img src="output/figures/comparison/Rating_by_Complexity.png" alt="Images shows a chart with box-and-whiskers plus viloin plots of data by options." />
 
                             <p>Both <cn>Complexity</cn> options covered all <cn>Rating</cn> values, and both had a median value of <ov>ChatGPT slightly better (5)</ov>. </p>
 
@@ -233,11 +232,17 @@
 
                         </div>
 
+                        <div>                            
+                        
+                            <table id="complexity-by-rating-table" class="data-table"></table>
+
+                        </div>
+
                         <h2>ChatGPT Column</h2>
 
                         <div>
 
-                            <img src="assets/figures/describe/Describe_ChatGPT_Response_Length.png" alt="Image shows a table with record count, mean, standard deviation, minimum, 25th percentile, median, 75th percentile, and maximum based on character length." />
+                            <img src="output/figures/describe/Describe_ChatGPT_Response_Length.png" alt="Image shows a table with record count, mean, standard deviation, minimum, 25th percentile, median, 75th percentile, and maximum based on character length." />
 
                             <p>The <cn>ChatGPT</cn> column contained text, with values ranging from 3 to 4428 characters in length, with a median value of 902.</p>
 
@@ -245,7 +250,7 @@
 
                         <div>
 
-                            <img src="assets/figures/visualize/ChatGPT_Response_Length.png" alt="Images shows a chart with box-and-whiskers plus viloin plots of data by length." />
+                            <img src="output/figures/visualize/ChatGPT_Response_Length.png" alt="Images shows a chart with box-and-whiskers plus viloin plots of data by length." />
 
                             <p><cn>ChatGPT</cn> length values had 22 (2.2%) outliers, ranging from 3332 to 4428, with a median value of 3538.0.</p>
 
@@ -255,7 +260,7 @@
 
                         <div>
 
-                            <img src="assets/figures/describe/Describe_Bard_Response_Length.png" alt="Image shows a table with record count, mean, standard deviation, minimum, 25th percentile, median, 75th percentile, and maximum based on character length." />
+                            <img src="output/figures/describe/Describe_Bard_Response_Length.png" alt="Image shows a table with record count, mean, standard deviation, minimum, 25th percentile, median, 75th percentile, and maximum based on character length." />
 
                             <p>The <cn>Bard</cn> column contained text, with length values ranging from 39 to 4002 characters in length, with a median value of 885.</p>
 
@@ -263,7 +268,7 @@
 
                         <div>
 
-                            <img src="assets/figures/visualize/Bard_Response_Length.png" alt="Images shows a chart with box-and-whiskers plus viloin plots of data by length." />
+                            <img src="output/figures/visualize/Bard_Response_Length.png" alt="Images shows a chart with box-and-whiskers plus viloin plots of data by length." />
 
                             <p><cn>Bard</cn> length values had 20 (2.0%) outliers, ranging from 2881 to 4002, with a median value of 3231.0.</p>
                             
@@ -273,7 +278,7 @@
 
                         <div>
 
-                            <img src="assets/figures/category/Categories_Rating_(Text_(Number)).png" alt="Image shows a table with record count and percentages by options." />
+                            <img src="output/figures/category/Categories_Rating_(Text_(Number)).png" alt="Image shows a table with record count and percentages by options." />
 
                             <p>The Rating, “Which model was more helpful, safe, and honest?”, was present as two columns. The first a numerical rating, the second the text phrase associated with that numerical rating.</p>
 
@@ -283,7 +288,7 @@
 
                         <div>
 
-                            <img src="assets/figures/visualize/Rating.png" alt="Images shows a chart with box-and-whiskers plus viloin plots of data by options." />
+                            <img src="output/figures/visualize/Rating.png" alt="Images shows a chart with box-and-whiskers plus viloin plots of data by options." />
 
                             <p>The median rating was <ov>ChatGPT slightly better (5)</ov>.</p>
 
@@ -291,39 +296,25 @@
 
                         </div>
 
-                        <h2>Explanation Column (all values)</h2>
+                        <h2>Explanation Column</h2>
 
                         <div>
 
-                            <img src="assets/figures/describe/Describe_Explanation_Length.png" alt="Image shows a table with record count, mean, standard deviation, minimum, 25th percentile, median, 75th percentile, and maximum based on character length." />
+                            <img src="output/figures/describe/Describe_Explanation_Length.png" alt="Image shows a table with record count, mean, standard deviation, minimum, 25th percentile, median, 75th percentile, and maximum based on character length." /> <img class="right" src="output/figures/describe/Describe_Explanation_Length_(NonZero).png" alt="Image shows a table with record count, mean, standard deviation, minimum, 25th percentile, median, 75th percentile, and maximum based on character length." />
 
                             <p>The <cn>Explanation</cn> column contained text, with length values ranging from 0 (as mentioned in the anomalies slide) to 2246 characters in length, with a median value of 188.</p>
 
+                            <p>Excluding the records without an entry, the <cn>Explanation</cn> column length values ranged from 26 to 2246 characters in length, with a median value of 233.</p>
+
                         </div>
 
                         <div>
 
-                            <img src="assets/figures/visualize/Explanation_Length.png" alt="Images shows a chart with box-and-whiskers plus viloin plots of data by length." />
+                            <img src="output/figures/visualize/Explanation_Length.png" alt="Images shows a chart with box-and-whiskers plus viloin plots of data by length." /> <img class="right" src="output/figures/visualize/Explanation_Length_(NonZero).png" alt="Images shows a chart with box-and-whiskers plus viloin plots of data by length." />
 
                             <p><cn>Explanation</cn> length values had 29 (2.9%) outliers, ranging from 595.0 to 2246.0, with a median value of 718.0.</p>
 
-                        </div>
-
-                        <h2>Explanation Column (non-zero)</h2>
-
-                        <div>
-
-                            <img src="assets/figures/describe/Describe_Explanation_Length_(NonZero).png" alt="Image shows a table with record count, mean, standard deviation, minimum, 25th percentile, median, 75th percentile, and maximum based on character length." />
-
-                            <p>The <cn>Explanation</cn> column – excluding the records without an explanation – had length values ranging from 26 to 2246 characters in length, with a median value of 233.</p>
-
-                        </div>
-
-                        <div>
-
-                            <img src="assets/figures/visualize/Explanation_Length_(NonZero).png" alt="Images shows a chart with box-and-whiskers plus viloin plots of data by length." />
-
-                            <p><cn>Explanation</cn> length (non-zero) values had 36 (4.6%) outliers, ranging from 566.0 to 2246.0, with a median value of 695.5.</p>
+                            <p>Excluding the records without an entry, the <cn>Explanation</cn> column length values had 36 (4.6%) outliers, ranging from 566.0 to 2246.0, with a median value of 695.5.</p>
 
                         </div>
 
@@ -363,7 +354,7 @@
 
                         <h2>Repeated Words in Explanation Column (.csv)</h2>
                         
-                        <table id="repeated-words-explanation-table"  class="data-table"></table>
+                        <table id="repeated-words-explanation-table" class="data-table"></table>
 
                     </section>
 

@@ -15,9 +15,9 @@ from collections import Counter
 
 gsheet_url = "https://docs.google.com/spreadsheets/d/1iIVMU_CAOAWInD1ht3xjMkrdLk-yNSvVDIc6hyCLUf8/export?format=csv&gid=5263407"
 
-BASE_ASSETS_DIR = Path( __file__ ).resolve().parents[ 2 ]
-FIGURES_ROOT    = BASE_ASSETS_DIR / "figures"
-CSV_ROOT    = BASE_ASSETS_DIR / "csv"
+BASE_ASSETS_DIR = Path( __file__ ).resolve().parents[ 3 ]
+FIGURES_ROOT    = BASE_ASSETS_DIR / "output/figures"
+CSV_ROOT    = BASE_ASSETS_DIR / "output/csv"
 
 pd.set_option( 'display.max_columns', None )
 pd.set_option( 'display.width', 200 )
@@ -67,6 +67,8 @@ def generate_plot_charts( df, column_name ):
    then save as an image.
    """
    
+   print( f" ... ... {column_name} ... " )
+   
    outdir = FIGURES_ROOT / "visualize"
    outdir.mkdir( parents = True, exist_ok = True )
 
@@ -102,9 +104,11 @@ def generate_plot_charts( df, column_name ):
 def generate_describe_table( df, column_name ):
 # ---------------------------------------------------------
    """
-   For numeric columns, describe the data
-   then save as an image.
+   For numeric columns, describe the data,
+   then save as .png.
    """
+   
+   print( f" ... ... {column_name} ... " )
    
    outdir = FIGURES_ROOT / "describe"
    outdir.mkdir( parents = True, exist_ok = True )
@@ -208,8 +212,11 @@ def generate_describe_table( df, column_name ):
 def generate_category_table( df, column_name ):
 # ---------------------------------------------------------
    """
-   Generates a simple table for data category values.
+   Generates a simple table for data category values,
+   then save as .png.
    """
+
+   print( f" ... ... {column_name} ... " )
   
    outdir = FIGURES_ROOT / "category"
    outdir.mkdir( parents = True, exist_ok = True )
@@ -304,12 +311,122 @@ def generate_category_table( df, column_name ):
    plt.close()
 
 # ---------------------------------------------------------
+def generate_crosstab_csv( df, numeric_col, category_col ):
+# ---------------------------------------------------------
+   """
+   Crosstab counts + percent-of-column in ONE CSV with a SINGLE header row.
+
+   Columns are interleaved per category:
+      <Category> (Count), <Category> (% of Column), ... , Total (Count), Total (% of Column)
+
+   Rows:
+      ratings 1..7 mapped via RATING_TEXT_LABELS + optional Missing + Total
+   """
+
+   friendly_rating   = FRIENDLY_NAMES.get( numeric_col, numeric_col )
+   friendly_category = FRIENDLY_NAMES.get( category_col, category_col )
+
+   print( f" ... ... CSV ( count + % of column ): {friendly_category} by {friendly_rating} ... " )
+
+   outdir = CSV_ROOT / "crosstab"
+   outdir.mkdir( parents = True, exist_ok = True )
+
+   tmp_df = df.copy()
+
+   tmp_df[ numeric_col ] = pd.to_numeric( tmp_df[ numeric_col ], errors = "coerce" ).astype( "Int64" )
+   tmp_df[ numeric_col ] = tmp_df[ numeric_col ].astype( "string" )
+   tmp_df[ numeric_col ] = tmp_df[ numeric_col ].where( tmp_df[ numeric_col ].notna(), "Missing" )
+
+   tmp_df[ category_col ] = tmp_df[ category_col ].where( tmp_df[ category_col ].notna(), "Missing" )
+   tmp_df[ category_col ] = tmp_df[ category_col ].astype( "string" )
+
+   counts = pd.crosstab(
+      index = tmp_df[ numeric_col ],
+      columns = tmp_df[ category_col ],
+      margins = True,
+      margins_name = "Total",
+      dropna = False
+   )
+
+   # Row order: 1..7, (Missing), Total
+   rating_order = [ str( i ) for i in range( 1, 8 ) ]
+   if "Missing" in counts.index:
+      rating_order.append( "Missing" )
+
+   row_order = [ r for r in rating_order if r in counts.index ]
+   if "Total" in counts.index:
+      row_order.append( "Total" )
+
+   # Column order: keep, but Total last
+   col_order = [ c for c in counts.columns if str( c ) != "Total" ]
+   if "Total" in counts.columns:
+      col_order.append( "Total" )
+
+   counts = counts.reindex( index = row_order, columns = col_order, fill_value = 0 )
+
+   # Percent-of-column
+   pct = counts.astype( float ).copy()
+
+   col_totals = pct.loc[ "Total" ] if "Total" in pct.index else pct.sum( axis = 0 )
+
+   for col in pct.columns:
+      denom = float( col_totals.get( col, 0.0 ) )
+      if denom > 0:
+         pct[ col ] = ( pct[ col ] / denom ) * 100.0
+      else:
+         pct[ col ] = 0.0
+
+   if "Total" in pct.index:
+      for col in pct.columns:
+         pct.loc[ "Total", col ] = 100.0 if col_totals.get( col, 0.0 ) > 0 else 0.0
+
+   # Rename rating index values using RATING_TEXT_LABELS ( keep Missing / Total )
+   rating_label_map = { str( k ): v for k, v in RATING_TEXT_LABELS.items() }
+
+   new_index = []
+   for idx in counts.index:
+      s = str( idx )
+      new_index.append( rating_label_map.get( s, s ) )
+
+   counts = counts.copy()
+   pct = pct.copy()
+
+   counts.index = new_index
+   pct.index = new_index
+
+   counts.index.name = "Rating"
+   pct.index.name = "Rating"
+
+   # Format percentages as strings
+   pct_fmt = pct.copy()
+   for col in pct_fmt.columns:
+      pct_fmt[ col ] = pct_fmt[ col ].map( lambda x: f"{x:.1f}%" )
+
+   # Combine into one table with a single header row
+   combined = pd.DataFrame( index = counts.index )
+
+   for col in counts.columns:
+      col_str = str( col )
+      combined[ f"{col_str} (Count)" ] = counts[ col ].astype( int )
+      combined[ f"{col_str} (% of Column)" ] = pct_fmt[ col ]
+
+   combined.index.name = "Rating"
+
+   safe_category = friendly_category.replace( " ", "_" )
+   safe_rating   = friendly_rating.replace( " ", "_" )
+   filename = outdir / f"Crosstab_{safe_category}_by_{safe_rating}.csv"
+
+   combined.to_csv( filename )
+
+# ---------------------------------------------------------
 def generate_comparison_charts( df, numeric_col, category_col ):
 # ---------------------------------------------------------
    """
-   Box plot of a numeric column grouped by a categorical column.
-   Saves one image: <Numeric>_by_<Category>.png
+   Box plot of a numeric column grouped by a categorical column,
+   then save as .png.
    """
+
+   print( f" ... ... {category_col} ... " )
    
    outdir = FIGURES_ROOT / "comparison"
    outdir.mkdir( parents = True, exist_ok = True )
@@ -394,7 +511,7 @@ def check_for_0_ratings( df, column_name ):
       for zero_pair, rating_val in zero_pairs:
          print( f" ... ... {column_name} {zero_pair} with rating {rating_val}" )
    else:
-      print( f" ... ... No zero-count rating combinations in {column_name}." )
+      print( f" ... ... {column_name} had no zero-count rating combinations." )
 
 # ---------------------------------------------------------
 def outlier_summary_for_column( df, column_name ):
@@ -440,11 +557,17 @@ def outlier_summary_for_column( df, column_name ):
          f"with a median value of {out_median}."
       )
 
-   print( f" ... ... ... {summary_text}" )
+   print( f" ... ... {summary_text}" )
       
 # ---------------------------------------------------------
 def generate_repeated_words_csv( df, column_name ):
 # ---------------------------------------------------------
+   """
+   Generate repeated words table,
+   then save as .csv.
+   """   
+
+   print( f" ... ... {column_name} ... " )
    
    outdir = CSV_ROOT
    outdir.mkdir( parents = True, exist_ok = True )
@@ -494,63 +617,6 @@ def generate_repeated_words_csv( df, column_name ):
    filename = outdir / f"RepeatedWords_{safe_name}.csv"
 
    repeated_df.to_csv( filename, index = False )
-
-# ---------------------------------------------------------
-def generate_repeated_words_csv( df, column_name ):
-# ---------------------------------------------------------
-   
-   outdir = CSV_ROOT
-   outdir.mkdir( parents = True, exist_ok = True )
-
-   friendly_name = FRIENDLY_NAMES.get( column_name, column_name )
-
-   text_series = (
-      df[ column_name ]
-      .fillna( "" )
-      .astype( str )
-      .str.replace( r"[^a-zA-Z\s]", " ", regex = True )
-      .str.lower()
-   )
-
-   # Split into tokens and flatten
-   words_series = text_series.str.split().explode()
-   words_series = words_series[ words_series.str.len() > 0 ]
-
-   # Remove stop words
-   filtered_words = words_series[ ~words_series.isin( stop_words ) ]
-
-   if filtered_words.empty:
-      repeated_df = pd.DataFrame(
-         columns = [ "word", "count", "percent_of_filtered_words" ]
-      )
-   else:
-      word_counts = filtered_words.value_counts()
-
-      # Only keep repeated words (appear more than once)
-      repeated_counts = word_counts[ word_counts > 1 ]
-
-      if repeated_counts.empty:
-         repeated_df = pd.DataFrame(
-            columns = [ "word", "count", "percent_of_filtered_words" ]
-         )
-      else:
-         total_filtered = int( filtered_words.shape[ 0 ] )
-
-         repeated_df = (
-            repeated_counts
-            .rename_axis( "word" )
-            .reset_index( name = "count" )
-         )
-
-         repeated_df[ "percent_of_filtered_words" ] = (
-            repeated_df[ "count" ] / total_filtered * 100.0
-         )
-
-   safe_name = friendly_name.replace( " ", "_" )
-   filename = outdir / f"RepeatedWords_{safe_name}.csv"
-
-   repeated_df.to_csv( filename, index = False )
-
    
 # ---------------------------------------------------------
 # Start Main Processing
@@ -603,43 +669,38 @@ try:
    # ---------------------------------------------------------
    # Generate and save figures
    # ---------------------------------------------------------
-
-   print( " ... Generating figures ... " )
    
-   print( f" ... ... Generating data description tables ... ")
+   print( f" ... Generating data description tables for column ... ")
    for col in numeric_df.columns:
-      print( f" ... ... ... for column {col} ... " )
       generate_describe_table( numeric_df, col ) 
    
-   print( f" ... ... Generating outlier summaries ... ")
+   print( f" ... Generating outlier summaries for column ... ")
    for col in numeric_df.columns:
       outlier_summary_for_column( numeric_df, col )
 
-   print( f" ... ... Generating box/violin plots ... ")
+   print( f" ... Generating box/violin plots for column ... ")
    for col in numeric_df.columns:
-      print( f" ... ... ... for column {col} ... " )
       generate_plot_charts( numeric_df, col )  
 
-   print( f" ... ... Generating category tables ... ")
+   print( f" ... Generating category tables for column ... ")
    for col in [ "Prompt Category", "Complexity", "Rating", "ExplanationPresence" ]:
-      print( f" ... ... ... for column {col} ... " )
       generate_category_table( df, col )
       
-   print( f" ... ... Generating comparison charts  ... ")
+   print( f" ... Generating crosstab csv for column ... ")
    for col in [ "PromptLengthBin", "Prompt Category", "Complexity" ]:
-      print( f" ... ... ... for column {col} ... " )
+      generate_crosstab_csv( df, rating_col, col )
+      
+   print( f" ... Generating comparison charts for column ... ")
+   for col in [ "PromptLengthBin", "Prompt Category", "Complexity" ]:
       generate_comparison_charts( df, rating_col, col )
    
-   print( f" ... Checking for Options without ratings ... ")
+   print( f" ... Checking for Options without ratings for column  ... ")
    for col in [ "Prompt Category", "Complexity" ]:
-      print( f" ... ... ... for column {col} ... " )
       check_for_0_ratings( df, col )
 
-   print( f" ... Generating repeated words .CSV ... " )
+   print( f" ... Generating repeated words .CSV for column ... " )
    for col in [ "Explanation" ]:
-      print( f" ... ... ... for column {col} ... " )
       generate_repeated_words_csv( df, col )
-
 
 except requests.exceptions.RequestException as e:
    print(f"Error fetching the file from URL: {e}")   

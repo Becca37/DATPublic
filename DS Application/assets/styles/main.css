@@ -8,7 +8,17 @@ html, body {
 
 p { padding-inline-start: 20px; }
 
-h1 { border-top: 1px solid #E0E0E0; margin-top: 25px; }
+h1 { border-top: 1px solid #dbdbdb;
+    margin-top: 25px; 
+    background-color: #5b5b5b;
+    color: white;
+    padding: 2px 5px;
+}
+
+h2, h3, h4, h5, h6 {
+    background-color:#ececec;
+    padding: 2px 5px;
+}
 
 section div ul {
     margin-left: 300px;
@@ -56,6 +66,10 @@ ov {
     margin: 0 1rem 1rem 0;     
     text-align: center;   
     width: 300px;  
+}
+
+.img-figure .right {
+    float: right;
 }
 
 .img-figure img {
