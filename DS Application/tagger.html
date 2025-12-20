@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Explanation Tagger</title>
+    <link rel="stylesheet" href="assets/styles/tagger.css">
+    <script src="assets/scripts/js/tagger.js" defer></script>
+</head>
+<body>
+    <div class="tagger-shell">
+
+            <div class="header-row">
+                <div class="title-block">
+                    <h1>Explanation Tagger</h1>
+                    <div class="subtitle">Add tags per model and save back to explanations.csv</div>
+                </div>
+            </div>
+
+        <div class="card">
+
+            <div class="content-block">
+                <div>
+                    <div class="label">Prompt</div>
+                    <div class="text-box prompt-box"><pre id="prompt"></pre></div>
+                </div>
+
+                <div class="response-row">
+                    <div>
+                        <div class="label">ChatGPT</div>
+                        <div class="text-box response-box"><pre id="chatgpt_response"></pre></div>
+                    </div>
+                    <div>
+                        <div class="label">Bard</div>
+                        <div class="text-box response-box"><pre id="bard_response"></pre></div>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="label">Explanation</div>
+                    <div class="text-box"><pre id="explanation"></pre></div>
+                </div>
+
+                <div class="meta-row">
+                    <span class="pill" id="record_id">ID</span>
+                    <span class="pill accent" id="rating">Rating</span>
+                    <span class="pill" id="prompt_category">Prompt Category</span>
+                    <div class="filter-row">
+                        <label class="switcher">
+                            <input type="checkbox" id="filter_untagged">
+                            <span>Show only untagged</span>
+                        </label>
+                        <label class="category-filter">
+                            <span class="label small">Prompt Category</span>
+                            <select id="category_filter"></select>
+                        </label>
+                        <label class="category-filter">
+                            <span class="label small">Tag</span>
+                            <select id="tag_filter"></select>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="inputs">
+                    <div class="input-field">
+                        <div class="label">Tags - ChatGPT</div>
+                        <div class="tag-input-row">
+                            <input id="tags_chatgpt_input" type="text" placeholder="Add tag for ChatGPT" />
+                            <button type="button" class="btn ghost" id="add_chatgpt">Add</button>
+                        </div>
+                        <div class="tag-picker-row">
+                            <input id="pick_chatgpt" list="list_chatgpt" placeholder="Search/select existing tag for ChatGPT" />
+                            <datalist id="list_chatgpt"></datalist>
+                            <button type="button" class="btn ghost" id="apply_chatgpt">Apply</button>
+                        </div>
+                        <div class="current-tags">
+                            <div class="label small">Current tags</div>
+                            <div id="current_chatgpt" class="chip-row"></div>
+                        </div>
+                    </div>
+                    <div class="input-field">
+                        <div class="label">Tags - Bard</div>
+                        <div class="tag-input-row">
+                            <input id="tags_bard_input" type="text" placeholder="Add tag for Bard" />
+                            <button type="button" class="btn ghost" id="add_bard">Add</button>
+                        </div>
+                        <div class="tag-picker-row">
+                            <input id="pick_bard" list="list_bard" placeholder="Search/select existing tag for Bard" />
+                            <datalist id="list_bard"></datalist>
+                            <button type="button" class="btn ghost" id="apply_bard">Apply</button>
+                        </div>
+                        <div class="current-tags">
+                            <div class="label small">Current tags</div>
+                            <div id="current_bard" class="chip-row"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="actions-row">
+                    <button id="btn_prev" class="btn">Prev</button>
+                    <button id="btn_next" class="btn">Next</button>
+                    <button id="btn_save" class="btn primary">Save</button>
+                    <button id="btn_save_next" class="btn primary">Save + Next</button>
+                </div>
+            </div>
+
+            <div class="footer-bar">
+                <div class="status" id="status"></div>
+                <div class="stack">
+                    <a href="assets/data/extract/explanations.csv" target="_blank">Open CSV</a>
+                    <span>&bull;</span>
+                    <span>Save writes back to the same file</span>
+                    <button type="button" class="btn ghost" id="btn_tag_missing">Tag missing explanations</button>
+                </div>
+            </div>
+
+            <div class="subcard">
+                <div class="rename-section">
+                    <div class="label small">Rename tag</div>
+                    <input id="rename_old" type="text" placeholder="Old tag" class="readonly-input" readonly />
+                    <div class="rename-row">
+                        <input id="rename_new" type="text" placeholder="New tag" />
+                        <button type="button" class="btn ghost" id="btn_rename">Rename tag</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="subcard">
+                <div class="replace-section">
+                    <div class="label small">Replace tag everywhere</div>
+                    <div class="replace-row">
+                        <label class="replace-field">
+                            <span class="label small">Replace this tag</span>
+                            <select id="replace_from"></select>
+                        </label>
+                        <label class="replace-field">
+                            <span class="label small">With this tag</span>
+                            <select id="replace_to"></select>
+                        </label>
+                        <button type="button" class="btn ghost" id="btn_replace">Replace</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="subcard">
+                <div class="available-tags">
+                    <div class="label small">Available tags (edit/remove)</div>
+                    <div id="available_tags" class="chip-row scrollable"></div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</body>
+</html>

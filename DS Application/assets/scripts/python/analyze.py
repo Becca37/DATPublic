@@ -18,6 +18,7 @@ gsheet_url = "https://docs.google.com/spreadsheets/d/1iIVMU_CAOAWInD1ht3xjMkrdLk
 BASE_ASSETS_DIR = Path( __file__ ).resolve().parents[ 3 ]
 FIGURES_ROOT    = BASE_ASSETS_DIR / "output/figures"
 CSV_ROOT    = BASE_ASSETS_DIR / "output/csv"
+EXTRACT_OUTPUT_PATH = BASE_ASSETS_DIR / "assets/data/extract/explanations.csv"
 
 pd.set_option( 'display.max_columns', None )
 pd.set_option( 'display.width', 200 )
@@ -619,10 +620,95 @@ def generate_repeated_words_csv( df, column_name ):
    repeated_df.to_csv( filename, index = False )
    
 # ---------------------------------------------------------
+def save_explanation_extract( df ):
+# ---------------------------------------------------------
+   """
+   Extract columns needed for tagging and save to CSV.
+   """
+
+   print( f" ... Generating explanation extract ... " )
+
+   outdir = EXTRACT_OUTPUT_PATH.parent
+   outdir.mkdir( parents = True, exist_ok = True )
+
+   rating_num_col = "Which model is more helpful, safe, and honest? (rating)"
+   rating_text_col = "Which model is more helpful, safe, and honest? (text)"
+
+   rating_text = df[ rating_text_col ].fillna( "" ).astype( str )
+   rating_num = df[ rating_num_col ].fillna( "" ).astype( str )
+
+   rating_combined = (
+      rating_text + np.where( rating_num.str.len() > 0, " (" + rating_num + ")", "" )
+   ).str.strip()
+
+   extract_df = pd.DataFrame(
+      {
+         "ID": range( 1, len( df ) + 1 ),
+         "Rating": rating_combined,
+         "Prompt Category": df.get( "Prompt Category", "" ),
+         "Prompt": df.get( "Prompt", "" ),
+         "ChatGPT": df.get( "ChatGPT", "" ),
+         "Bard": df.get( "Bard", "" ),
+         "Explanation": df[ "Explanation" ],
+         "Tags - ChatGPT": "",
+         "Tags - Bard": "",
+      }
+   )
+
+   extract_df = pd.DataFrame(
+      {
+         "ID": extract_df[ "ID" ],
+         "Rating": extract_df[ "Rating" ],
+         "Prompt Category": extract_df[ "Prompt Category" ],
+         "Prompt": extract_df[ "Prompt" ],
+         "ChatGPT": extract_df[ "ChatGPT" ],
+         "Bard": extract_df[ "Bard" ],
+         "Explanation": extract_df[ "Explanation" ],
+         "Tags - ChatGPT": extract_df[ "Tags - ChatGPT" ],
+         "Tags - Bard": extract_df[ "Tags - Bard" ],
+      }
+   )
+
+   # Preserve existing tags if the extract already exists (even if row count changed)
+   if EXTRACT_OUTPUT_PATH.exists():
+      try:
+         prior_df = pd.read_csv( EXTRACT_OUTPUT_PATH, keep_default_na = False )
+         if "ID" in prior_df.columns:
+            prior_df = prior_df.set_index( "ID" )
+            extract_df = extract_df.set_index( "ID" )
+
+            common_ids = prior_df.index.intersection( extract_df.index )
+            if len( common_ids ) > 0:
+               for col in [ "Tags - ChatGPT", "Tags - Bard", "ChatGPT", "Bard" ]:
+                  if col in prior_df.columns and col in extract_df.columns:
+                     extract_df.loc[ common_ids, col ] = prior_df.loc[ common_ids, col ]
+
+            extract_df = extract_df.reset_index()
+         else:
+            overlap = min( len( prior_df ), len( extract_df ) )
+            if overlap > 0:
+               if "Tags - ChatGPT" in prior_df.columns:
+                  extract_df.loc[ :overlap - 1, "Tags - ChatGPT" ] = prior_df.loc[ :overlap - 1, "Tags - ChatGPT" ]
+               if "Tags - Bard" in prior_df.columns:
+                  extract_df.loc[ :overlap - 1, "Tags - Bard" ] = prior_df.loc[ :overlap - 1, "Tags - Bard" ]
+               if "ChatGPT" in prior_df.columns:
+                  extract_df.loc[ :overlap - 1, "ChatGPT" ] = prior_df.loc[ :overlap - 1, "ChatGPT" ]
+               if "Bard" in prior_df.columns:
+                  extract_df.loc[ :overlap - 1, "Bard" ] = prior_df.loc[ :overlap - 1, "Bard" ]
+      except Exception as exc:
+         print( f" ... ... Warning: could not merge existing tags: {exc}" )
+
+   extract_df.to_csv( EXTRACT_OUTPUT_PATH, index = False )
+
+   print( f" ... ... Saved extract to {EXTRACT_OUTPUT_PATH} ... " )
+   
+# ---------------------------------------------------------
 # Start Main Processing
 # ---------------------------------------------------------
 
 try:
+   
+   print( f"Starting" )
    
    print( f"Reading data in from {gsheet_url} ... " )
 
@@ -701,6 +787,9 @@ try:
    print( f" ... Generating repeated words .CSV for column ... " )
    for col in [ "Explanation" ]:
       generate_repeated_words_csv( df, col )
+
+   print( f" ... Generating extract for explanations ... " )
+   save_explanation_extract( df )
 
 except requests.exceptions.RequestException as e:
    print(f"Error fetching the file from URL: {e}")   
